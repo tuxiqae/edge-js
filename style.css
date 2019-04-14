@@ -1,0 +1,37 @@
+/* Page template */
+
+body {
+    margin: 0; padding: 0;
+    position: relative;
+}
+
+/* Topbar styles */
+
+.topbar-container {
+    padding: 30px 0;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Main content styles */
+
+.main-container {
+
+}
+
+.main-container .header-container {
+    text-align: center;
+}
+
+/* Board */
+
+#board {
+    height: 600px; width: 600px;
+    margin: 50px auto 0;
+    border: 1px solid black;
+}
+
+/* Footer styles */
+
+.footer-container {
+
+}
