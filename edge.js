@@ -43,28 +43,6 @@
     };
 
     /*
-        Draws a line between two points.
-        Point must be { row: INT, col: INT }.
-    */
-    Board.prototype.drawLine = function(p1, p2, options) {
-        options = options || {};
-
-        let fromRow = Math.min(p1.row, p2.row), toRow = Math.max(p1.row, p2.row);
-        let fromCol = Math.min(p1.col, p2.col), toCol = Math.max(p1.col, p2.col);
-
-        // Calculate how many drawings per col
-        let pixelsPerCol = Math.floor(((toRow - fromRow) / (toCol - fromCol + 1)) + 1);
-
-        for(let col = fromCol; col <= toCol; col++) {
-            for(let row = fromRow; row < fromRow + pixelsPerCol; row++) {
-                if(row > toRow) break;
-                this.draw({ col: col, row: row });
-            }
-            fromRow += pixelsPerCol;
-        }
-    }
-
-    /*
         This function paints a pixel on the board.
         arg2 is either an options object or a color string (css).
         Default color is black.
@@ -78,7 +56,28 @@
         p.col %= this.width;
 
         this.board[p.col][p.row].color(options.color);
-   }
+    }
+    /*
+        Draws a line between two points.
+        Point must be { row: INT, col: INT }.
+    */
+    Board.prototype.drawLine = function(p1, p2, options) {
+        options = options || {};
+
+        let fromRow = Math.min(p1.row, p2.row), toRow = Math.max(p1.row, p2.row);
+        let fromCol = Math.min(p1.col, p2.col), toCol = Math.max(p1.col, p2.col);
+
+        // Calculate how many drawings per col
+        let stepsDownPerCol = Math.floor((toRow - fromRow) / (toCol - fromCol + 1));
+
+        for(let col = fromCol; col <= toCol; col++) {
+            for(let row = fromRow; row <= fromRow + stepsDownPerCol; row++) {
+                if(row > toRow) break;
+                this.draw({ col: col, row: row });
+            }
+            fromRow += stepsDownPerCol;
+        }
+    }
 
     function Pixel(options) {
         // Creating pixel el
