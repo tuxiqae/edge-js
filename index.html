@@ -24,12 +24,20 @@
     </body>
     <script>
         let board = new Edge.Board(document.getElementById('board'));
+        let circle = [], center = { col: 100, row: 100 };
+        let radius = 50, circlePoints = 20, pointRotation = 2*Math.PI / circlePoints;
 
-        let p1 = { row: 50, col: 50 }, p2 = { row: 100, col: 100 }, p3 = { row: 20, col: 150 };
+        for(let i = 0; i < circlePoints; i++) {
+            let rotation = i * pointRotation;
 
-        // board.drawObject([p1, p2, p3]);
+            let x = Math.round(radius * Math.cos(rotation)), y = Math.round(radius * Math.sin(rotation));
 
-        // board.drawLine(p2, p1);
-        // board.drawLine(p3, p2);
+            circle.push({
+                col: x + center.col,
+                row: y + center.row
+            });
+        }
+
+        board.drawObject(circle);
     </script>
 </html>
