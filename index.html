@@ -24,20 +24,35 @@
     </body>
     <script>
         let board = new Edge.Board(document.getElementById('board'));
-        let circle = [], center = { col: 100, row: 100 };
-        let radius = 50, circlePoints = 20, pointRotation = 2*Math.PI / circlePoints;
+        let circle = [];
+        let radius = 30, circlePoints = 20, pointRotation = 2*Math.PI / circlePoints;
 
         for(let i = 0; i < circlePoints; i++) {
             let rotation = i * pointRotation;
 
-            let x = Math.round(radius * Math.cos(rotation)), y = Math.round(radius * Math.sin(rotation));
+            let distortion = radius * 0.1;
+            let r = (radius - distortion) + (Math.random()*distortion*2)
+
+            let x = Math.round(r * Math.cos(rotation)), y = Math.round(r * Math.sin(rotation));
 
             circle.push({
-                col: x + center.col,
-                row: y + center.row
+                col: x,
+                row: y
             });
         }
 
-        board.drawObject(circle);
+        board.drawObject(circle, {
+            center: { col: 50, row: 30 }
+        });
+
+        let plane = [
+            { col: 0, row: 10 },
+            { col: 5, row: -5 },
+            { col: -5, row: -5 }
+        ];
+        board.drawObject(plane, {
+            center: { col: 100, row: 100 },
+            rotate: 30 * Math.PI / 180
+        });
     </script>
 </html>

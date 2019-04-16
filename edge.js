@@ -55,6 +55,9 @@
         p.row %= this.height;
         p.col %= this.width;
 
+        if(p.row < 0) p.row += this.height;
+        if(p.col < 0) p.col += this.width;
+
         this.board[p.row][p.col].color(options.color);
     }
 
@@ -106,6 +109,20 @@
 
         for(let i = 0; i < points.length; i++) {
             let p1 = points[i], p2 = points[(i+1)%points.length];
+            p1 = { row: p1.row, col: p1.col };
+            p2 = { row: p2.row, col: p2.col };
+
+            if(options.rotate) {
+                rotatePoint(p1, options.rotate);
+                rotatePoint(p2, options.rotate);
+            }
+            
+            if(options.center) {
+                p1.row += options.center.row; p1.col += options.center.col;
+                p2.row += options.center.row; p2.col += options.center.col;
+            }
+
+            // console.log(p1);
             this.drawLine(p2, p1);
         }
     };
@@ -129,6 +146,23 @@
     Pixel.prototype.color = function(color) {
         this.state = Pixel.State.Color;
         this.el.style.backgroundColor = color;
+    }
+    
+    function rotatePoint(p, rotation) {
+        let r = Math.sqrt(Math.pow(p.row, 2) + Math.pow(p.col, 2)), 
+            angle = Math.asin(p.row / r);
+
+        // Considering quarters
+        if(p.row >= 0 && p.col < 0) {
+            angle = Math.PI - angle;
+        } else if(p.row < 0 && p.col <= 0) {
+            angle = -Math.PI - angle;
+        }
+
+        angle += rotation;
+
+        p.col = Math.round(r * Math.cos(angle));
+        p.row = Math.round(r * Math.sin(angle));
     }
 
     global.Edge = {
