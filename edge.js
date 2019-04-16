@@ -102,27 +102,25 @@
     }
 
     /*
-        
+        This function takes an array of points that make an object, and draws lines between them.
+        Available options:
+            center { col: x, row: y } - offset point to draw the object.
+            rotate <radians> - rotate object.
     */
     Board.prototype.drawObject = function(points, options) {
         options = options || {};
-
         for(let i = 0; i < points.length; i++) {
             let p1 = points[i], p2 = points[(i+1)%points.length];
             p1 = { row: p1.row, col: p1.col };
             p2 = { row: p2.row, col: p2.col };
-
             if(options.rotate) {
                 rotatePoint(p1, options.rotate);
                 rotatePoint(p2, options.rotate);
             }
-            
             if(options.center) {
                 p1.row += options.center.row; p1.col += options.center.col;
                 p2.row += options.center.row; p2.col += options.center.col;
             }
-
-            // console.log(p1);
             this.drawLine(p2, p1);
         }
     };
