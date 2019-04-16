@@ -24,35 +24,57 @@
     </body>
     <script>
         let board = new Edge.Board(document.getElementById('board'));
-        let circle = [];
-        let radius = 30, circlePoints = 20, pointRotation = 2*Math.PI / circlePoints;
 
-        for(let i = 0; i < circlePoints; i++) {
-            let rotation = i * pointRotation;
+        board.onCreate = function() {
+            let circle = [];
+            let radius = 30, circlePoints = 20, pointRotation = 2*Math.PI / circlePoints;
 
-            let distortion = radius * 0.1;
-            let r = (radius - distortion) + (Math.random()*distortion*2)
+            for(let i = 0; i < circlePoints; i++) {
+                let rotation = i * pointRotation;
 
-            let x = Math.round(r * Math.cos(rotation)), y = Math.round(r * Math.sin(rotation));
+                let distortion = radius * 0.1;
+                let r = (radius - distortion) + (Math.random()*distortion*2)
 
-            circle.push({
-                col: x,
-                row: y
+                let x = Math.round(r * Math.cos(rotation)), y = Math.round(r * Math.sin(rotation));
+
+                circle.push({
+                    col: x,
+                    row: y
+                });
+            }
+
+            this.circle = {
+                points: circle,
+                center: { col: 50, row: 30 },
+                rotate: 0
+            };
+
+            this.plane = [
+                { col: 0, row: 10 },
+                { col: 5, row: -5 },
+                { col: -5, row: -5 }
+            ];
+        };
+
+        board.onUpdate = function() {
+            let elapsedSeconds = this._elapsed / 1000;
+            let v = 30, rv = Math.PI / 10;
+
+            board.drawObject(this.circle.points, {
+                center: this.circle.center,
+                rotate: this.circle.rotate
             });
-        }
 
-        board.drawObject(circle, {
-            center: { col: 50, row: 30 }
-        });
+            this.circle.center.col += (v * elapsedSeconds);
+            this.circle.center.row += (v * elapsedSeconds);
+            this.circle.rotate += (rv * elapsedSeconds);
 
-        let plane = [
-            { col: 0, row: 10 },
-            { col: 5, row: -5 },
-            { col: -5, row: -5 }
-        ];
-        board.drawObject(plane, {
-            center: { col: 100, row: 100 },
-            rotate: 30 * Math.PI / 180
-        });
+            board.drawObject(this.plane, {
+                center: { col: 100, row: 100 },
+                rotate: 30 * Math.PI / 180
+            });
+        };
+
+        board.start();
     </script>
 </html>

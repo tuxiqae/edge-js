@@ -9,10 +9,39 @@
         // Default values for board
         this.height = options.height || 200;
         this.width = options.width || 200;
-
-        // Initiating board
-        this.createBoard();
     }
+
+    /* 
+        This function creates the board and starts the game.
+        It is preferable to use the "Board.onCreate" function hook to set game values.
+        Use "onUpdate" function to hook to the update of the screen.
+    */
+    Board.prototype.start = function() {
+        this.createBoard();
+
+        if(typeof this.onCreate === 'function')
+            this.onCreate.call(this);
+        
+        this._elapsed = 0;
+        this.update();
+    };
+
+    Board.prototype.update = function() {
+        let _this = this;
+
+        for(let y = 0; y < this.height; y++)
+            for(let x = 0; x < this.width; x++)
+                this.board[y][x].clear();
+
+        if(this._lastUpdate)
+            this._elapsed = Date.now() - this._lastUpdate;
+
+        if(typeof this.onUpdate === 'function')
+            this.onUpdate.call(this);
+
+        this._lastUpdate = Date.now();
+        setTimeout(function() { _this.update(); }, 0);
+    };
 
     Board.prototype.createBoard = function() {
         // Clearing boardEl
@@ -66,6 +95,10 @@
         Point must be { row: INT, col: INT }.
     */
     Board.prototype.drawLine = function(p1, p2, options) {
+        // Make sure points are ints
+        p1 = { col: Math.round(p1.col), row: Math.round(p1.row) };
+        p2 = { col: Math.round(p2.col), row: Math.round(p2.row) };
+        
         // Calculate starting and ending points for line drawing
         let fromCol = Math.min(p1.col, p2.col), toCol = Math.max(p1.col, p2.col);
         let fromRow = Math.min(p1.row, p2.row), toRow = Math.max(p1.row, p2.row);
@@ -82,7 +115,6 @@
             let pixelsPerCol = Math.round(Math.abs(p2.row - p1.row) / (Math.abs(p2.col - p1.col) + 1));
             // Calculate "n" using p1
             let n = p1.row - m * p1.col;
-
             for(let col = fromCol; col <= toCol; col++) {
                 // If pixelsPerCol === 0, we have a horizontal line (y = c)
                 if(pixelsPerCol === 0) {
@@ -90,13 +122,13 @@
                     this.draw({ col: col, row: y });
                 } else {
                     for(let row = fromRow; row < fromRow + pixelsPerCol; row++) {
-                        // For every row, calculate appropriate col
+                        // For every row (y), calculate appropriate col (x)
                         let x = Math.round((row - n) / m);
                         if(x > toCol || row > toRow) break;
                         this.draw({ col: x, row: row });
                     }
+                    fromRow += pixelsPerCol;
                 }
-                fromRow += pixelsPerCol;
             }
         }
     }
@@ -144,6 +176,11 @@
     Pixel.prototype.color = function(color) {
         this.state = Pixel.State.Color;
         this.el.style.backgroundColor = color;
+    }
+
+    Pixel.prototype.clear = function() {
+        this.state = Pixel.State.Empty;
+        this.el.style.backgroundColor = 'white';
     }
     
     function rotatePoint(p, rotation) {
