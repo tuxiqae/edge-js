@@ -27,8 +27,6 @@
     };
 
     Board.prototype.update = function() {
-        let _this = this;
-
         for(let y = 0; y < this.height; y++)
             for(let x = 0; x < this.width; x++)
                 this.board[y][x].clear();
@@ -40,6 +38,7 @@
             this.onUpdate.call(this);
 
         this._lastUpdate = Date.now();
+        let _this = this;
         setTimeout(function() { _this.update(); }, 0);
     };
 
@@ -77,18 +76,24 @@
         Default color is black.
     */
     Board.prototype.draw = function(p, options) {
+        p = { col: Math.round(p.col), row: Math.round(p.row) };
+
         if(!options || typeof options === 'string') 
             options = { color: options || 'black' };
 
+        this.wrap(p);
+
+        this.board[p.row][p.col].color(options.color);
+    }
+
+    Board.prototype.wrap = function(p) {
         // Wrap edges
         p.row %= this.height;
         p.col %= this.width;
 
         if(p.row < 0) p.row += this.height;
         if(p.col < 0) p.col += this.width;
-
-        this.board[p.row][p.col].color(options.color);
-    }
+    };
 
     /*
         Draws a line between two points.
@@ -139,7 +144,7 @@
             center { col: x, row: y } - offset point to draw the object.
             rotate <radians> - rotate object.
     */
-    Board.prototype.drawObject = function(points, options) {
+    Board.prototype.drawObject = function(points, options, debug) {
         options = options || {};
         for(let i = 0; i < points.length; i++) {
             let p1 = points[i], p2 = points[(i+1)%points.length];
@@ -150,12 +155,65 @@
                 rotatePoint(p2, options.rotate);
             }
             if(options.center) {
+                this.wrap(options.center);
                 p1.row += options.center.row; p1.col += options.center.col;
                 p2.row += options.center.row; p2.col += options.center.col;
             }
+            if(debug) 
+                console.log(p1, p2);
             this.drawLine(p2, p1);
         }
     };
+
+    /*
+        This function takes two objects,
+        returns TRUE if one of points in Obj1 is inside Obj2.    
+    */
+    Board.prototype.checkCollision = function(obj1, obj2) {
+        let collision = false;
+
+        for(let i = 0; i < obj1.points.length && !collision; i++) {
+            if(this.isPointInObject(obj1.points[i], obj1.center, obj2))
+                collision = true;
+        }
+
+        return collision;
+    }
+
+
+    /*
+        This function takes a point and checks left-plane distance value from edges of Obj.
+    */
+    Board.prototype.isPointInObject = function(p, pCenter, obj) {
+        let points = obj.points, objCenter = obj.center;
+
+        let inside = true;
+
+        for(let i = 1; i < points.length && inside; i++) {
+            let pA = points[i-1],
+                pB = points[i];
+
+            let px = p.col + pCenter.col,
+                py = p.row + pCenter.row,
+                
+                pAx = pA.col + objCenter.col,
+                pAy = pA.row + objCenter.row,
+                
+                pBx = pB.col + objCenter.col,
+                pBy = pB.row + objCenter.row;
+            
+            let A = -1 * (pBy - pAy),
+                B = pBx - pAx,
+                C = -1 * ( (A*pAx) + (B*pAy) );
+
+            let D = (A * px) + (B * py) + C;
+
+            if(D < 0)
+                inside = false;
+        }
+
+        return inside;
+    }
 
     function Pixel(options) {
         // Creating pixel el
