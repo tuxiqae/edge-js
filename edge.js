@@ -54,9 +54,9 @@
         // Creating board matrix
         this.board = [];
 
-        // Iterating throw ROWS then COLUMNS
+        // Iterating through ROWS then COLUMNS
         for(let row = 0; row < this.height; row++) {
-            // Crating row array
+            // Creating row array
             this.board[row] = [];
             for(let col = 0; col < this.width; col++) {
                 let p = new Pixel({
@@ -139,7 +139,7 @@
     }
 
     /*
-        This function takes an array of points that make an object, and draws lines between them.
+        This function takes an array of points that makes an object, and draws lines between them.
         Available options:
             center { col: x, row: y } - offset point to draw the object.
             rotate <radians> - rotate object.
@@ -167,7 +167,7 @@
 
     /*
         This function takes two objects,
-        returns TRUE if one of points in Obj1 is inside Obj2.    
+        returns TRUE if one of the points in Obj1 is inside Obj2.    
     */
     Board.prototype.checkCollision = function(obj1, obj2) {
         let collision = false;
